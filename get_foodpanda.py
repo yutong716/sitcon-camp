@@ -82,4 +82,4 @@ async def on_message(message):
 
 
 load_dotenv()
-bot.run('ODc1OTA4MTI4NTQ4NDcwODA1.YRcXAw.uGrr0buFphbA5lGVdGHRIGrbmpQ')
+bot.run(os.getenv('TOKEN'))
