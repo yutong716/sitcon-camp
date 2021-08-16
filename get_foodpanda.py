@@ -104,22 +104,27 @@ async def on_message(message):
             url.replace('longitude=','longitude='+str(payload['location']['point']['longitude']))
             nr=rq.get(url=url,headers=ahead)
             dic=json.loads(nr.text)
-
-            for j in dic['data']['menus'][0]['menu_categories'] :
-                em=dc.Embed(
-                    title=j['name']
-                )
-                for i in j['products'] :
-                    flag=False
-                    if i['product_variations'][0]['price']==0 :
-                        flag=True
-                        break
-                    ret='價格：'+str(i['product_variations'][0]['price'])+'\n'+i['description']+'\n'
-                    em.add_field(name=f'{i["name"]}',value=ret,inline=False)
-                if flag==False :
-                    await message.channel.send(embed=em)
-
             
+            for i in range(1,len(dic)):
+                await message.channel.send(i)
+                for j in dic['data']['menus'][0]['menu_categories'] :
+                    em=dc.Embed(
+                        title=j['name']
+                    )
+                    for i in j['products'] :
+                        flag=False
+                        if i['product_variations'][0]['price']==0 :
+                            flag=True
+                            break
+                        ret='價格：'+str(i['product_variations'][0]['price'])+'\n'+i['description']+'\n'
+                        em.add_field(name=f'{i["name"]}',value=ret,inline=False)
+                    if flag==False :
+                        await message.channel.send(embed=em)
+             
+        await message.channel.send("你想吃什麼呢?")
+        await message.channel.send("請回復餐點前的編號")
+        
+        
 
 
 
