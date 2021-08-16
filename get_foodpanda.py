@@ -62,6 +62,9 @@ async def on_message(message):
             r=rq.post('https://disco.deliveryhero.io/search/api/v1/feed',data=json.dumps(now_payload),headers=headers)
             
             rt_list=json.loads(r.text)
+            if len(rt_list['feed']['items'])==0 :
+                await message.channel.send('無查詢結果')
+                return
             r_list=rt_list['feed']['items'][0]['items']
         
             embed = dc.Embed(
