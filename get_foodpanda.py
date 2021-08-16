@@ -16,6 +16,10 @@ headers = {
         'content-type': "application/json",
     }
 
+ahead={
+    'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36 Edg/92.0.902.73'
+}
+
 @bot.event
 async def on_ready():
     channel=bot.get_channel(871443543732912163)
@@ -75,7 +79,7 @@ async def on_message(message):
                     options=[
                         SelectOption(f'{1}. {r_list[0]["name"]}','1'),
                         SelectOption(f'{2}. {r_list[1]["name"]}','2'),
-                        SelectOption(f'{2}. {r_list[2]["name"]}','3'),
+                        SelectOption(f'{3}. {r_list[2]["name"]}','3'),
                         SelectOption(f'{4}. {r_list[3]["name"]}','4'),
                         SelectOption(f'{5}. {r_list[4]["name"]}','5')
                     ]
@@ -85,16 +89,25 @@ async def on_message(message):
 
             inter = await reply.wait_for_dropdown()
             labels = [option.label for option in inter.select_menu.selected_options]
-
+    
             await inter.reply(f"已選擇選項: {', '.join(labels)}")
+
+            option=int(labels[0][0])-1
+            code=r_list[option]['code']
+            url='https://tw.fd-api.com/api/v5/vendors/b6gn?include=menus&language_id=6&dynamic_pricing=0&opening_type=delivery&basket_currency=TWD&latitude=&longitude='
+            url.replace('b6gn',code)
+            url.replace('latitude=','latitude='+str(payload['location']['point']['latitude']))
+            url.replace('longitude=','longitude='+str(payload['location']['point']['latitude']))
+            nr=rq.get(url=url,headers=ahead)
+            dic=json.loads(nr.text)
+            for j in dic['data']['menus'][0]['menu_categories'] :
+                for i in j['products'] :
+                    await message.channel.send(i['name'])
+
+
+
+
             
-
-
-
-
-
-        
-
 
 
 
