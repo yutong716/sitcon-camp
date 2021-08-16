@@ -98,7 +98,7 @@ async def on_message(message):
             url='https://tw.fd-api.com/api/v5/vendors/b6gn?include=menus&language_id=6&dynamic_pricing=0&opening_type=delivery&basket_currency=TWD&latitude=&longitude='
             url.replace('b6gn',code)
             url.replace('latitude=','latitude='+str(payload['location']['point']['latitude']))
-            url.replace('longitude=','longitude='+str(payload['location']['point']['latitude']))
+            url.replace('longitude=','longitude='+str(payload['location']['point']['longitude']))
             nr=rq.get(url=url,headers=ahead)
             dic=json.loads(nr.text)
 
