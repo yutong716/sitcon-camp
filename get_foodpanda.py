@@ -1,4 +1,3 @@
-import requests as rq
 import json
 import os
 from dislash import SelectMenu, SelectOption, InteractionClient
@@ -6,6 +5,7 @@ import discord as dc
 import asyncio
 from discord.ext import commands
 from dotenv import load_dotenv
+import requests as rq
 
 bot=commands.Bot(command_prefix='##')
 slash = InteractionClient(bot)
@@ -25,6 +25,16 @@ async def on_ready():
     channel=bot.get_channel(871443543732912163)
     await channel.send('點餐機器人啟動')
 
+tot=0 # Finished
+user_tot=0 # Finished
+user_num={}# Finished
+user_bought=[]
+user_cost=[]
+dish=[]# Finished
+all_dished=[]
+
+
+
 used=False
 entered=False
 keyword=''
@@ -37,6 +47,9 @@ async def on_message(message):
         global payload
         global entered
         global used
+        global tot
+        global dish
+        global user_tot
         payload['location']['point']['latitude']=float(a)
         payload['location']['point']['longitude']=float(b)
         entered=True
@@ -44,6 +57,8 @@ async def on_message(message):
     elif string.startswith('##clear') :
         used=False
         await message.channel.send('查詢資料清除成功')
+        tot=0
+        dish_cost=[]
     elif string.startswith('##search') :
         global keyword
         global reply
@@ -94,8 +109,7 @@ async def on_message(message):
             labels = [option.label for option in inter.select_menu.selected_options]
     
             await inter.reply(f"已選擇選項: {', '.join(labels)}")
-            await message.channel.send("菜單")
-                
+
             option=int(labels[0][0])-1
             code=r_list[option]['code']
             lurl=r_list[option]['redirection_url']
@@ -106,29 +120,50 @@ async def on_message(message):
             nr=rq.get(url=url,headers=ahead)
             dic=json.loads(nr.text)
             
-            for i in range(1,len(dic)):
-                await message.channel.send(i)
-                for j in dic['data']['menus'][0]['menu_categories'] :
-                    em=dc.Embed(
-                        title=j['name']
-                    )
-                    for i in j['products'] :
-                        flag=False
-                        if i['product_variations'][0]['price']==0 :
-                            flag=True
-                            break
-                        ret='價格：'+str(i['product_variations'][0]['price'])+'\n'+i['description']+'\n'
-                        em.add_field(name=f'{i["name"]}',value=ret,inline=False)
-                    if flag==False :
-                        await message.channel.send(embed=em)
+            for j in dic['data']['menus'][0]['menu_categories'] :
+                em=dc.Embed(
+                    title=j['name']
+                )
+                for i in j['products'] :
+                    flag=False
+                    if i['product_variations'][0]['price']==0 :
+                        flag=True
+                        break
+                    ret='價格：'+str(i['product_variations'][0]['price'])+'\n'+i['description']+'\n'
+                    em.add_field(name=f'{tot+1}. {i["name"]}',value=ret,inline=False)
+                    tup=(i['product_variations'][0]['price'],i['name'])
+                    dish.append(tup)
+                    tot+=1
+
+                if flag==False :
+                    await message.channel.send(embed=em)
              
-        await message.channel.send("你想吃什麼呢?")
-        await message.channel.send("請回復餐點前的編號")
         
-        
+    elif string.startswith('##buy') :
+        global user_bought
+        global all_dished
+        global user_cost
+        global user_num
+        string,a,b=string.split(' ')
+        tup=(int(a)-1,b)
+        user=message.author
+        if user in user_num :
+            user_cost[user_num[user]]+=dish[int(a)-1][0]
+            user_bought[user_num[user]].append(tup)
+        else :
+            user_num[user]=user_tot
+            user_tot+=1
+            user_cost.append(dish[int(a)-1][0])
+            user_bought.append([tup])
+        await message.channel.send(f'成功購買 !')
+        all_dished.append(tup)
 
-
-
+    elif string.startswith('##check') :
+        user=message.author
+        await message.channel.send(f'目前累計{user_cost[user_num[user]]}元，已購買：')
+        for i in user_bought[user_num[user]] :
+            #print(type(i),type(i[0]))
+            await message.channel.send(f'{dish[i[0]][1]}，註：{i[1]}')
 
            
 load_dotenv()
