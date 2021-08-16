@@ -16,7 +16,7 @@ headers = {
 
 @bot.event
 async def on_ready():
-    channel=bot.get_channel(864860749153959991)
+    channel=bot.get_channel(871443543732912163)
     await channel.send('點餐機器人啟動')
 
 used=False
