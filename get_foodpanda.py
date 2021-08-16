@@ -114,7 +114,8 @@ async def on_message(message):
                     if i['product_variations'][0]['price']==0 :
                         flag=True
                         break
-                    em.add_field(name=f'{i["name"]}',value=f'價格：{i["product_variations"][0]["price"]}',inline=False)
+                    ret='價格：'+str(i['product_variations'][0]['price'])+'\n'+i['description']+'\n'
+                    em.add_field(name=f'{i["name"]}',value=ret,inline=False)
                 if flag==False :
                     await message.channel.send(embed=em)
 
