@@ -24,6 +24,7 @@ async def on_ready():
 used=False
 entered=False
 keyword=''
+user=''
 @bot.event
 async def on_message(message):
     string=message.content
@@ -42,13 +43,14 @@ async def on_message(message):
     elif string.startswith('##search') :
         global keyword
         global reply
-
+        
         if entered==False :
             await message.channel.send('請先輸入座標')
         elif used==True :
             await message.channel.send('已經開始一個查詢')
         else :
             used=True
+            user=message.author
             string,keyword=string.split(' ')
 
             now_payload=payload
@@ -62,7 +64,7 @@ async def on_message(message):
                 title='請選擇所要的餐廳'
             )
             for i in range(1,6) :
-                embed.add_field(name=f'{i}. {r_list[i-1]["name"]}',value=f'評價{r_list[i-1]["rating"]}顆星,外送{r_list[i-1]["minimum_delivery_fee"]}元以上,{r_list[i-1]["minimum_delivery_time"]}分鐘送達',inline=False)
+                embed.add_field(name=f'{i}. {r_list[i-1]["name"]}',value=f'評價 {r_list[i-1]["rating"]} 顆星, 外送{r_list[i-1]["minimum_delivery_fee"]} 元以上, {r_list[i-1]["minimum_delivery_time"]} 分鐘送達',inline=False)
             
             await message.channel.send(embed=embed)
 
@@ -83,6 +85,7 @@ async def on_message(message):
 
             inter = await reply.wait_for_dropdown()
             labels = [option.label for option in inter.select_menu.selected_options]
+
             await inter.reply(f"已選擇選項: {', '.join(labels)}")
             
 
@@ -91,6 +94,9 @@ async def on_message(message):
 
 
         
+
+
+
 
 
 
