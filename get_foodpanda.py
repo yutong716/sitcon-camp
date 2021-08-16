@@ -30,8 +30,8 @@ async def on_message(message):
         string,a,b=string.split(' ')
         global payload
         global entered
-        payload['latitude']=float(a)
-        payload['longitude']=float(b)
+        payload['location']['point']['latitude']=float(a)
+        payload['location']['point']['longitude']=float(b)
         entered=True
         await message.channel.send('定位成功 !')
 
@@ -82,4 +82,4 @@ async def on_message(message):
 
 
 load_dotenv()
-bot.run(os.getenv('TOKEN'))
+bot.run('ODc1OTA4MTI4NTQ4NDcwODA1.YRcXAw.uGrr0buFphbA5lGVdGHRIGrbmpQ')
