@@ -7,6 +7,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 bot=commands.Bot(command_prefix='##')
+command_prefix = '##'
 
 payload={"q":"starbucks","location":{"point":{"latitude":22.6394924,"longitude":120.302583}},"config":"Variant21","customer_id  ":"","vertical_types":["restaurants"],"include_component_types":["vendors"],"include_fields":["feed"],"language_id":"6","opening    _type":"delivery","platform":"web","session_id":"","language_code":"zh","customer_type":"regular","limit":10,"offset":0,"dps_se  ssion_id":"eyJzZXNzaW9uX2lkIjoiMzhhOGUwZTBmYTllZmNlMGIzZTM4ZjNkZDFiMzE4ZjkiLCJwZXJzZXVzX2lkIjoiMTYyODg0ODk0NC42NTQzNzg4MjU2LjQxe    E05NHIxSDgiLCJ0aW1lc3RhbXAiOjE2Mjg5NDYwMDV9","dynamic_pricing":0,"brand":"foodpanda","country_code":"tw","use_free_delivery_la  bel":False}
 
@@ -26,6 +27,10 @@ keyword=''
 @bot.event
 async def on_message(message):
     string=message.content
+
+    if message.content == command_prefix+"echo":
+        await message.channel.send('echo')
+
     if string.startswith('init') :
         string,a,b=string.split(' ')
         global payload
