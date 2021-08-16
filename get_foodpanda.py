@@ -94,7 +94,8 @@ async def on_message(message):
             labels = [option.label for option in inter.select_menu.selected_options]
     
             await inter.reply(f"已選擇選項: {', '.join(labels)}")
-
+            await message.channel.send("菜單")
+                
             option=int(labels[0][0])-1
             code=r_list[option]['code']
             lurl=r_list[option]['redirection_url']
