@@ -94,34 +94,32 @@ async def on_message(message):
 
             option=int(labels[0][0])-1
             code=r_list[option]['code']
+            lurl=r_list[option]['redirection_url']
             url='https://tw.fd-api.com/api/v5/vendors/b6gn?include=menus&language_id=6&dynamic_pricing=0&opening_type=delivery&basket_currency=TWD&latitude=&longitude='
             url.replace('b6gn',code)
             url.replace('latitude=','latitude='+str(payload['location']['point']['latitude']))
             url.replace('longitude=','longitude='+str(payload['location']['point']['latitude']))
             nr=rq.get(url=url,headers=ahead)
             dic=json.loads(nr.text)
+
             for j in dic['data']['menus'][0]['menu_categories'] :
+                em=dc.Embed(
+                    title=j['name']
+                )
                 for i in j['products'] :
-                    await message.channel.send(i['name'])
-
-
-
+                    flag=False
+                    if i['product_variations'][0]['price']==0 :
+                        flag=True
+                        break
+                    em.add_field(name=f'{i["name"]}',value=f'價格：{i["product_variations"][0]["price"]}',inline=False)
+                if flag==False :
+                    await message.channel.send(embed=em)
 
             
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
+           
 load_dotenv()
 bot.run(os.getenv('TOKEN'))
