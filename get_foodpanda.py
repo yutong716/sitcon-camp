@@ -118,11 +118,7 @@ async def on_message(message):
 
             option=int(labels[0][0])-1
             code=r_list[option]['code']
-            lurl=r_list[option]['redirection_url']
-            url='https://tw.fd-api.com/api/v5/vendors/b6gn?include=menus&language_id=6&dynamic_pricing=0&opening_type=delivery&basket_currency=TWD&latitude=&longitude='
-            url.replace('b6gn',code)
-            url.replace('latitude=','latitude='+str(payload['location']['point']['latitude']))
-            url.replace('longitude=','longitude='+str(payload['location']['point']['longitude']))
+            url='https://tw.fd-api.com/api/v5/vendors/'+code+'?include=menus&language_id=6&dynamic_pricing=0&opening_type=delivery&basket_currency=TWD&latitude='+str(payload['location']['point']['latitude'])+'&longitude='+str(payload['location']['point']['longitude'])
             nr=rq.get(url=url,headers=ahead)
             dic=json.loads(nr.text)
             
