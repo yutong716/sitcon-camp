@@ -1,13 +1,25 @@
+pipenv install dislash.py
+
 import json
 import os
-from dislash import SelectMenu, SelectOption, InteractionClient
+from os import getenv
+import discord
 import discord as dc
-import asyncio
 from discord.ext import commands
+from dislash import SelectMenu, SelectOption, InteractionClient
+import asyncio
+import googlemaps
 from dotenv import load_dotenv
 import requests as rq
 
-bot=commands.Bot(command_prefix='##')
+
+
+bot = commands.Bot(command_prefix='##')
+bot = discord.Client()
+
+GOOGLE_API_KEY = getenv('GOOGLE_API_KEY')
+gmaps = googlemaps.Client(key=GOOGLE_API_KEY)
+
 slash = InteractionClient(bot)
 
 payload={"q":"starbucks","location":{"point":{"latitude":22.6394924,"longitude":120.302583}},"config":"Variant21","customer_id  ":"","vertical_types":["restaurants"],"include_component_types":["vendors"],"include_fields":["feed"],"language_id":"6","opening    _type":"delivery","platform":"web","session_id":"","language_code":"zh","customer_type":"regular","limit":10,"offset":0,"dps_se  ssion_id":"eyJzZXNzaW9uX2lkIjoiMzhhOGUwZTBmYTllZmNlMGIzZTM4ZjNkZDFiMzE4ZjkiLCJwZXJzZXVzX2lkIjoiMTYyODg0ODk0NC42NTQzNzg4MjU2LjQxe    E05NHIxSDgiLCJ0aW1lc3RhbXAiOjE2Mjg5NDYwMDV9","dynamic_pricing":0,"brand":"foodpanda","country_code":"tw","use_free_delivery_la  bel":False}
@@ -26,6 +38,7 @@ async def on_ready():
     await channel.send('點餐機器人啟動')
 
 tot=0 # Finished
+box = 0
 user_tot=0 # Finished
 user_num={}# Finished
 user_bought=[]
@@ -41,7 +54,22 @@ keyword=''
 user=''
 @bot.event
 async def on_message(message):
-    string=message.content
+    string = message.content
+    global box
+    if message.author == bot.user:
+        return
+    if string.startswith("##init"):
+        string,a=string.split(" ")
+    if a == "我要訂餐":
+        await message.channel.send("請輸入地址:")
+        box=1
+        return
+    if box == 1:
+        address=message.content
+        geocode_result = gmaps.geocode(address)
+        print(geocode_result[0]["geometry"]["location"]["lat"])
+        print(geocode_result[0]["geometry"]["location"]["lng"])
+        await message.channel.send("定位成功")
     if string.startswith('##init') :
         string,a,b=string.split(' ')
         global payload
@@ -55,7 +83,7 @@ async def on_message(message):
         entered=True
         await message.channel.send('定位成功 !')
     elif string.startswith('##clear') :
-        used=False
+        used = False
         await message.channel.send('查詢資料清除成功')
         tot=0
         dish_cost=[]
@@ -137,7 +165,6 @@ async def on_message(message):
 
                 if flag==False :
                     await message.channel.send(embed=em)
-             
         
     elif string.startswith('##buy') :
         global user_bought
@@ -165,6 +192,5 @@ async def on_message(message):
             #print(type(i),type(i[0]))
             await message.channel.send(f'{dish[i[0]][1]}，註：{i[1]}')
 
-           
 load_dotenv()
 bot.run(os.getenv('TOKEN'))
