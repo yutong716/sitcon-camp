@@ -141,6 +141,9 @@ async def on_message(message):
         
     elif string.startswith('##buy') :
         string, a, b = string.split(' ')
+        if int(a)-1>=tot or int(a)<=0:
+            await message.channel.send('沒有這個品項拉')
+            return 
         tup = (int(a)-1,b)
         user = message.author
         if user in user_num :
@@ -156,12 +159,12 @@ async def on_message(message):
 
     elif string.startswith('##check') :
         user = message.author
-        if user not in user_num :
+        if user not in user_num or len(user_bought[user_num[user]])==0 :
             await message.channel.send('您尚未購買任何餐點')
             return 
         user = message.author
-        embed = dc.Embed(
-            title = f'累計{user_cost[user_num[user]]}元，已購買：'
+        embed=dc.Embed(
+            title=f'{user} 累計{user_cost[user_num[user]]}元，已購買：'
             )
         total = 1
         for i in user_bought[user_num[user]] :
@@ -173,6 +176,9 @@ async def on_message(message):
         user = message.author
         string,a = string.split(' ')
         a = int(a)
+        if a>len([user_bought[user_num[user]]]) or a<=0 :
+            await message.channel.send('沒有這個選項')
+            return 
         user_cost[user_num[user]]-=dish[user_bought[user_num[user]][a-1][0]][0]
         all_cost -= dish[user_bought[user_num[user]][a-1][0]][0]
         del user_bought[user_num[user]][a-1]
