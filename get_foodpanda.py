@@ -30,14 +30,12 @@ async def on_ready():
     channel=bot.get_channel(871443543732912163)
     await channel.send('點餐機器人啟動')
 
-tot=0 # Finished
-user_tot=0 # Finished
-user_num={}# Finished
-user_bought=[]
-user_cost=[]
-dish=[]# Finished
-all_dished=[]
-all_cost=0
+tot=0 # 餐點數(不用理他)
+user_tot=0 # 總人數(不用理他)
+user_num={} # dictionary, 代表每個人的編號, 用法：user_num[message.author] -> 代碼
+user_bought=[] # 二維陣列，每個人買了什麼東西，用法：user_bought[user_num[message.author]] -> 這是一個單維陣列，元素皆為tuple(餐點代碼,註解)
+user_cost=[] # 一維陣列，每個人總共花的錢，用法：user_cost[user_num[message.author]] -> 錢錢
+dish=[] # 一維陣列，利用餐點代碼存取，裡面的元素都是tuple(價格,名稱)
 
 
 
@@ -47,7 +45,7 @@ keyword=''
 user=''
 @bot.event
 async def on_message(message):
-    global used,entered,keyword,tot,user_tot,user_num,user_bought,user_cost,dish,all_dished,all_cost
+    global used,entered,keyword,tot,user_tot,user_num,user_bought,user_cost,dish
     string=message.content
     if string.startswith('##init') :
         string,a=string.split(' ')
@@ -133,7 +131,7 @@ async def on_message(message):
                         break
                     ret='價格：'+str(i['product_variations'][0]['price'])+'\n'+i['description']+'\n'
                     em.add_field(name=f'{tot+1}. {i["name"]}',value=ret,inline=False)
-                    tup=(i['product_variations'][0]['price'],i['name'])
+                    tup=(int(i['product_variations'][0]['price']),i['name'])
                     dish.append(tup)
                     tot+=1
 
@@ -154,19 +152,32 @@ async def on_message(message):
             user_cost.append(dish[int(a)-1][0])
             user_bought.append([tup])
         await message.channel.send(f'成功購買 !')
-        all_dished.append(tup)
         all_cost+=dish[int(a)-1][0]
 
     elif string.startswith('##check') :
         user=message.author
+        if user not in user_num :
+            await message.channel.send('您尚未購買任何餐點')
+            return 
+        user=message.author
         embed=dc.Embed(
             title=f'累計{user_cost[user_num[user]]}元，已購買：'
             )
+        total=1
         for i in user_bought[user_num[user]] :
-            embed.add_field(name=f'{dish[i[0]][1]}',value=i[1],inline=False)
+            embed.add_field(name=f'{total}: {dish[i[0]][1]}, 價格：{dish[i[0]][0]}',value=i[1],inline=False)
+            total+=1
         await message.channel.send(embed=embed)
+    
+    elif string.startswith('##erase') :
+        user=message.author
+        string,a=string.split(' ')
+        a=int(a)
+        user_cost[user_num[user]]-=dish[user_bought[user_num[user]][a-1][0]][0]
+        all_cost-=dish[user_bought[user_num[user]][a-1][0]][0]
+        del user_bought[user_num[user]][a-1]
 
-
+        await message.channel.send('移除成功')
     
            
 bot.run(os.getenv('TOKEN'))
