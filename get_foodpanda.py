@@ -68,9 +68,9 @@ async def on_message(message):
     elif string.startswith('##search') :
         
         if entered == False :
-            await message.channel.send('請先輸入座標')
+            await message.channel.send('請先輸入你家地址...嘿嘿')
         elif used == True :
-            await message.channel.send('已經開始一個查詢')
+            await message.channel.send('都不看訊息的對不對')
         else :
             used = True
             user = message.author
@@ -82,7 +82,7 @@ async def on_message(message):
             
             rt_list = json.loads(r.text)
             if len(rt_list['feed']['items']) == 0 :
-                await message.channel.send('無查詢結果')
+                await message.channel.send('你家太鄉下囉')
                 return
             r_list = rt_list['feed']['items'][0]['items']
         
@@ -142,7 +142,7 @@ async def on_message(message):
     elif string.startswith('##buy') :
         string, a, b = string.split(' ')
         if int(a)-1>=tot or int(a)<=0:
-            await message.channel.send('沒有這個品項拉')
+            await message.channel.send('有事嗎')
             return 
         tup = (int(a)-1,b)
         user = message.author
@@ -155,6 +155,8 @@ async def on_message(message):
             user_cost.append(dish[int(a)-1][0])
             user_bought.append([tup])
         await message.channel.send(f'成功購買 !')
+        if user_bought[user_num[user]]%3==0 :
+            await message.channel.send('讓我想想...你應該是肥宅...')
         all_cost += dish[int(a)-1][0]
 
     elif string.startswith('##check') :
@@ -177,12 +179,12 @@ async def on_message(message):
         string,a = string.split(' ')
         a = int(a)
         if a>len([user_bought[user_num[user]]]) or a<=0 :
-            await message.channel.send('沒有這個選項')
+            await message.channel.send('這選項...你是要我怎樣')
             return 
         user_cost[user_num[user]]-=dish[user_bought[user_num[user]][a-1][0]][0]
         all_cost -= dish[user_bought[user_num[user]][a-1][0]][0]
         del user_bought[user_num[user]][a-1]
 
-        await message.channel.send('移除成功')
+        await message.channel.send('移除品項&瘦身成功')
 
 bot.run(os.getenv('TOKEN'))
