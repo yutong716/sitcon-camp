@@ -196,7 +196,7 @@ async def on_message(message):
         user=message.author
         await message.channel.send(f'總價格:{user_cost[user_num[user]]}元')
         for i in user_bought[user_num[user]] :
-            await message.channel.send(f'{dish[i[0]][1]}，註：{i[1]}')
+            await message.channel.send(f'{dish[i[0]][1]}，{i[1]}')
         await message.channel.send("謝謝購買")
 
 load_dotenv()
